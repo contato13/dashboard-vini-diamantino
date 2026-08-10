@@ -1,0 +1,333 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel de mídia — Meta Ads</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter+Tight:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --paper:#EFF1EC; --card:#FFFFFF; --ink:#141E1A; --muted:#6E7C77;
+  --line:#D8DDD5; --win:#0A5C3C; --loss:#B23F1C; --accent:#2B3BFF;
+  --r:3px;
+  --display:"Bricolage Grotesque",system-ui,sans-serif;
+  --body:"Inter Tight",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.45;
+     padding:28px 22px 80px;max-width:1440px;margin:0 auto}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ---------- cabeçalho ---------- */
+.masthead{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;
+          border-bottom:1.5px solid var(--ink);padding-bottom:14px}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.acct{font-family:var(--display);font-size:clamp(30px,5vw,50px);font-weight:800;letter-spacing:-.03em;
+      line-height:.95;margin-top:4px}
+.period{font-family:var(--mono);font-size:11.5px;color:var(--muted);text-align:right;white-space:nowrap}
+.period b{display:block;color:var(--ink);font-weight:600;font-size:13px}
+
+/* ---------- faixa de KPI ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+      border-bottom:1px solid var(--line);margin-bottom:22px}
+.kpi{padding:16px 18px 14px;border-right:1px solid var(--line)}
+.kpi:last-child{border-right:0}
+.kpi-l{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.kpi-v{font-family:var(--mono);font-size:24px;font-weight:600;letter-spacing:-.03em;margin-top:5px;
+       font-variant-numeric:tabular-nums}
+.kpi-s{font-size:11.5px;color:var(--muted);margin-top:1px}
+
+/* ---------- controles ---------- */
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+.tabs{display:flex;gap:2px;background:var(--line);padding:2px;border-radius:var(--r)}
+.tab{font-family:var(--body);font-size:12.5px;font-weight:500;padding:6px 14px;border:0;cursor:pointer;
+     background:transparent;color:var(--muted);border-radius:2px}
+.tab[aria-selected=true]{background:var(--card);color:var(--ink);font-weight:600}
+.spacer{flex:1}
+select,input[type=text]{font-family:var(--body);font-size:12.5px;padding:6px 9px;border:1px solid var(--line);
+        background:var(--card);color:var(--ink);border-radius:var(--r)}
+label.ctl{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+          color:var(--muted);display:flex;align-items:center;gap:6px}
+
+/* ---------- mural de criativos ---------- */
+.wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px;align-items:start}
+.creative{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;
+          display:flex;flex-direction:column;animation:rise .32s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.frame{position:relative;background:var(--ink);aspect-ratio:4/5;overflow:hidden}
+.frame img,.frame video{width:100%;height:100%;object-fit:cover;display:block}
+.rank{position:absolute;top:0;left:0;z-index:3;font-family:var(--mono);font-size:10px;font-weight:600;
+      background:var(--ink);color:var(--paper);padding:4px 7px;letter-spacing:.06em}
+.kind{position:absolute;top:7px;right:7px;z-index:3;font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+      text-transform:uppercase;background:rgba(255,255,255,.9);color:var(--ink);padding:3px 6px;border-radius:2px}
+.missing{position:absolute;inset:0;display:grid;place-content:center;text-align:center;gap:6px;padding:16px;
+         color:rgba(255,255,255,.55);font-family:var(--mono);font-size:10px;letter-spacing:.08em}
+
+/* barra de retenção sobre o vídeo — a assinatura do painel */
+.scrub{position:absolute;left:0;right:0;bottom:0;height:34px;z-index:2;
+       background:linear-gradient(transparent,rgba(0,0,0,.72));display:flex;align-items:flex-end;padding:0 8px 7px}
+.track{position:relative;flex:1;height:20px;display:flex;align-items:flex-end}
+.rail{position:absolute;left:0;right:0;bottom:0;height:1.5px;background:rgba(255,255,255,.3)}
+.played{position:absolute;left:0;bottom:0;height:1.5px;background:#fff;width:0}
+.notch{position:absolute;bottom:0;width:3px;background:rgba(255,255,255,.85);transform:translateX(-50%)}
+.notch span{position:absolute;bottom:calc(100% + 2px);left:50%;transform:translateX(-50%);
+            font-family:var(--mono);font-size:8px;color:#fff;opacity:.8;white-space:nowrap}
+
+/* ---------- números do card ---------- */
+.meta{padding:11px 12px 6px;border-bottom:1px solid var(--line)}
+.name{font-size:12.5px;font-weight:600;line-height:1.25;overflow:hidden;display:-webkit-box;
+      -webkit-line-clamp:2;-webkit-box-orient:vertical}
+.crumb{font-family:var(--mono);font-size:9.5px;color:var(--muted);margin-top:4px;letter-spacing:.02em;
+       overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.stat{padding:9px 12px;border-top:1px solid var(--line)}
+.stat:nth-child(odd){border-right:1px solid var(--line)}
+.stat-l{font-family:var(--mono);font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.stat-v{font-family:var(--mono);font-size:15px;font-weight:600;letter-spacing:-.02em;
+        font-variant-numeric:tabular-nums;margin-top:1px}
+.good{color:var(--win)} .bad{color:var(--loss)}
+
+/* ---------- tabelas ---------- */
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);
+      border-radius:var(--r);overflow:hidden}
+th{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);
+   text-align:right;padding:10px 12px;border-bottom:1px solid var(--ink);font-weight:500;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+td{font-family:var(--mono);font-size:12.5px;font-variant-numeric:tabular-nums;text-align:right;
+   padding:10px 12px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+td.nm{font-family:var(--body);font-size:13px;font-weight:500;max-width:300px}
+td.nm small{display:block;font-family:var(--mono);font-size:9.5px;color:var(--muted);font-weight:400}
+tbody tr:hover{background:var(--paper)}
+
+.empty{padding:60px 20px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r)}
+.empty b{display:block;font-family:var(--display);font-size:20px;color:var(--ink);margin-bottom:6px;font-weight:700}
+.note{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:26px;letter-spacing:.03em}
+.hide{display:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header class="masthead">
+  <div>
+    <div class="eyebrow" id="eyebrow">Relatório de mídia paga</div>
+    <h1 class="acct" id="acctName">—</h1>
+  </div>
+  <div class="period" id="periodBox"></div>
+</header>
+
+<section class="kpis" id="kpis"></section>
+
+<div class="bar">
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true"  data-view="creatives">Criativos</button>
+    <button class="tab" role="tab" aria-selected="false" data-view="audiences">Públicos</button>
+    <button class="tab" role="tab" aria-selected="false" data-view="campaigns">Campanhas</button>
+  </div>
+  <div class="spacer"></div>
+  <label class="ctl">Ordenar
+    <select id="sortBy">
+      <option value="cpa">Menor CPA</option>
+      <option value="spend">Maior gasto</option>
+      <option value="results">Mais resultados</option>
+      <option value="roas">Maior ROAS</option>
+      <option value="hookRate">Maior hook rate</option>
+      <option value="ctr">Maior CTR</option>
+    </select>
+  </label>
+  <label class="ctl">Volume mínimo
+    <select id="minVol">
+      <option value="0">Tudo</option>
+      <option value="1000" selected>1.000 impressões</option>
+      <option value="3000">3.000 impressões</option>
+      <option value="10000">10.000 impressões</option>
+    </select>
+  </label>
+</div>
+
+<main id="view"></main>
+<p class="note" id="note"></p>
+
+<script>
+/* ============================================================
+   1. CONFIGURAÇÃO — o único bloco que você edita
+
+   Este é o painel do cliente DeProf. A conta está TRAVADA:
+   o parâmetro ?conta= da URL é ignorado de propósito, para o
+   cliente não conseguir trocar o ID na barra de endereço e ver
+   os dados de outra conta.
+
+   Para a versão interna da agência, com troca de conta pela URL,
+   substitua a linha do "const conta" por:
+
+     const conta = new URLSearchParams(location.search).get("conta") || CONTA;
+
+   ============================================================ */
+
+// Webhook do n8n. Mantenha o {conta} — ele é substituído abaixo.
+// O path depois de /webhook/ tem que ser IGUAL ao do nó "Webhook painel".
+const FEED = "https://n8n.plugu.com.br/webhook/painel-a7f3c9e2?conta={conta}";
+
+// DeProf. Trocar aqui é o suficiente para gerar o painel de outro cliente.
+const CONTA = "act_355028158720763";
+
+const conta = CONTA;
+const FEED_URL = FEED.includes("{conta}") ? FEED.replace("{conta}", conta) : FEED;
+
+const BRL = n => "R$ " + (Number(n)||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
+const INT = n => (Number(n)||0).toLocaleString("pt-BR",{maximumFractionDigits:0});
+const PCT = n => ((Number(n)||0)*100).toFixed(2).replace(".",",") + "%";
+const X   = n => (Number(n)||0).toFixed(2).replace(".",",") + "x";
+
+let DATA = null, VIEW = "creatives";
+
+/* ---------- render ---------- */
+function head(){
+  document.getElementById("acctName").textContent = DATA.account?.name || "Conta sem nome";
+  document.getElementById("periodBox").innerHTML =
+    `<b>${DATA.period?.label||""}</b>${DATA.period?.since||""} → ${DATA.period?.until||""}`;
+  const t = DATA.totals||{};
+  const cpa = t.results ? t.spend/t.results : null;
+  const cells = [
+    ["Investido", BRL(t.spend), INT(t.impressions)+" impressões"],
+    [DATA.resultLabel||"Resultados", INT(t.results), INT(t.clicks)+" cliques"],
+    ["CPA", cpa==null?"—":BRL(cpa), "custo por resultado"],
+    ["Receita", BRL(t.revenue), "valor de conversão"],
+    ["ROAS", t.spend?X(t.revenue/t.spend):"—", "retorno sobre gasto"],
+  ];
+  document.getElementById("kpis").innerHTML = cells.map(([l,v,s])=>
+    `<div class="kpi"><div class="kpi-l">${l}</div><div class="kpi-v">${v}</div><div class="kpi-s">${s}</div></div>`).join("");
+}
+
+function sorted(rows){
+  const k = document.getElementById("sortBy").value;
+  const min = +document.getElementById("minVol").value;
+  const f = rows.filter(r => (r.impressions||0) >= min);
+  return f.sort((a,b)=>{
+    if(k==="cpa"){ const A=a.cpa??Infinity, B=b.cpa??Infinity; return A-B; }
+    return (b[k]||0)-(a[k]||0);
+  });
+}
+
+function mediaBlock(c){
+  const ratio = c.width && c.height ? `${c.width}/${c.height}` : "4/5";
+  const label = {video:"vídeo",image:"estático",carousel:"carrossel"}[c.mediaType] || "—";
+  let inner;
+  if (c.mediaType === "video" && c.videoUrl){
+    inner = `<video src="${c.videoUrl}" poster="${c.posterUrl||""}" muted loop playsinline preload="metadata"></video>`;
+  } else if (c.imageUrl || c.posterUrl){
+    inner = `<img src="${c.imageUrl||c.posterUrl}" alt="${(c.adName||"").replace(/"/g,"&quot;")}" loading="lazy">`;
+  } else {
+    inner = `<div class="missing">asset não recuperado<br>reprocessar no n8n</div>`;
+  }
+  let scrub = "";
+  if (c.mediaType === "video" && c.retention){
+    const r = c.retention;
+    const notch = (p,v)=> v==null?"":`<i class="notch" style="left:${p}%;height:${Math.max(2,v*18)}px"><span>${Math.round(v*100)}</span></i>`;
+    scrub = `<div class="scrub"><div class="track"><i class="rail"></i><i class="played"></i>
+      ${notch(25,r.p25)}${notch(50,r.p50)}${notch(75,r.p75)}${notch(100,r.p100)}</div></div>`;
+  }
+  return `<div class="frame" style="aspect-ratio:${ratio}">${inner}${scrub}</div>`;
+}
+
+function creativeCard(c,i){
+  const cpaCls = c.cpa==null ? "" : (c.cpa <= (DATA.targetCpa||Infinity) ? "good" : "");
+  const stats = [
+    ["Gasto", BRL(c.spend), ""],
+    [DATA.resultLabel||"Result.", INT(c.results), ""],
+    ["CPA", c.cpa==null?"—":BRL(c.cpa), cpaCls],
+    [c.mediaType==="video"?"Hook rate":"CTR", c.mediaType==="video"&&c.hookRate!=null?PCT(c.hookRate):PCT(c.ctr), ""],
+  ];
+  return `<article class="creative" style="animation-delay:${Math.min(i*35,400)}ms">
+    ${mediaBlock(c)}
+    <div class="rank">${String(i+1).padStart(2,"0")}</div>
+    <div class="kind">${{video:"vídeo",image:"estático",carousel:"carrossel"}[c.mediaType]||"—"}</div>
+    <div class="meta">
+      <div class="name">${c.adName||"Sem nome"}</div>
+      <div class="crumb">${c.adsetName||""}</div>
+    </div>
+    <div class="stats">${stats.map(([l,v,cl])=>
+      `<div class="stat"><div class="stat-l">${l}</div><div class="stat-v ${cl}">${v}</div></div>`).join("")}</div>
+  </article>`;
+}
+
+function table(rows, nameKey, subKey){
+  if(!rows.length) return `<div class="empty"><b>Nada com volume suficiente</b>Baixe o filtro de volume mínimo para ver tudo.</div>`;
+  const R = DATA.resultLabel||"Resultados";
+  return `<table><thead><tr><th>Nome</th><th>Gasto</th><th>${R}</th><th>CPA</th><th>ROAS</th><th>CTR</th><th>Impressões</th><th>Freq.</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr>
+      <td class="nm">${r[nameKey]||"—"}<small>${r[subKey]||""}</small></td>
+      <td>${BRL(r.spend)}</td><td>${INT(r.results)}</td>
+      <td>${r.cpa==null?"—":BRL(r.cpa)}</td><td>${X(r.roas)}</td>
+      <td>${PCT(r.ctr)}</td><td>${INT(r.impressions)}</td>
+      <td>${r.frequency?r.frequency.toFixed(2).replace(".",","):"—"}</td></tr>`).join("")}
+  </tbody></table>`;
+}
+
+function render(){
+  head();
+  const el = document.getElementById("view");
+  if (VIEW === "creatives"){
+    const rows = sorted(DATA.creatives||[]);
+    el.innerHTML = rows.length
+      ? `<div class="wall">${rows.map(creativeCard).join("")}</div>`
+      : `<div class="empty"><b>Nenhum criativo no filtro</b>Baixe o volume mínimo ou amplie o período.</div>`;
+    wireVideos();
+  } else if (VIEW === "audiences"){
+    el.innerHTML = table(sorted(DATA.audiences||[]), "adsetName", "targetingSummary");
+  } else {
+    el.innerHTML = table(sorted(DATA.campaigns||[]), "campaignName", "campaignId");
+  }
+  const quando = DATA.generatedAt ? new Date(DATA.generatedAt).toLocaleString("pt-BR") : "—";
+  document.getElementById("note").textContent =
+    `Dados atualizados em ${quando} · ${(DATA.creatives||[]).length} criativos no período`;
+}
+
+/* vídeo toca sem som no hover; a barra de retenção acompanha o progresso */
+function wireVideos(){
+  document.querySelectorAll(".creative").forEach(card=>{
+    const v = card.querySelector("video"), played = card.querySelector(".played");
+    if(!v) return;
+    card.addEventListener("mouseenter", ()=> v.play().catch(()=>{}));
+    card.addEventListener("mouseleave", ()=>{ v.pause(); v.currentTime = 0; if(played) played.style.width="0"; });
+    v.addEventListener("timeupdate", ()=>{ if(played && v.duration) played.style.width = (v.currentTime/v.duration*100)+"%"; });
+  });
+}
+
+/* ---------- controles ---------- */
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected", x===t));
+  VIEW = t.dataset.view; render();
+}));
+["sortBy","minVol"].forEach(id=>document.getElementById(id).addEventListener("change",render));
+
+/* ---------- carga ---------- */
+(async function load(){
+  if(FEED.includes("SEU-N8N") || !conta){
+    document.getElementById("view").innerHTML =
+      `<div class="empty"><b>Falta configurar</b>Edite as constantes FEED e CONTA no topo do arquivo.</div>`;
+    return;
+  }
+  document.getElementById("view").innerHTML = `<div class="empty"><b>Carregando</b>Buscando os dados…</div>`;
+  try{
+    // Sem headers customizados de propósito: qualquer header extra (Accept,
+    // Content-Type, Authorization) transforma isso numa requisição "não simples"
+    // e o navegador dispara um OPTIONS de preflight antes. O nó Webhook do n8n
+    // só responde a GET, o preflight falha, e o erro chega como "Failed to fetch"
+    // sem código HTTP nenhum — impossível de diagnosticar pela mensagem.
+    const res = await fetch(FEED_URL, {cache:"no-cache"});
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    DATA = await res.json();
+    if(Array.isArray(DATA)) DATA = DATA[0];
+    if(!DATA || !DATA.creatives) throw new Error("resposta sem a lista de criativos");
+    render();
+  }catch(err){
+    document.getElementById("view").innerHTML =
+      `<div class="empty"><b>Não foi possível carregar os dados</b>${err.message}. Verifique se o workflow
+       do n8n está ativo, se já rodou uma vez, e se o header Access-Control-Allow-Origin aponta para
+       este domínio — sem barra no final.</div>`;
+    document.getElementById("note").textContent = "";
+  }
+})();
+</script>
